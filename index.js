@@ -11,7 +11,7 @@ const { findInReactTree, findInTree } = require('powercord/util');
  */
 module.exports = class VCTimer extends Plugin {
   startPlugin () {
-    // this.patchRTC();
+    this.patchRTC();
   }
 
   async patchRTC () {
