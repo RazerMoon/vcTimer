@@ -42,6 +42,8 @@ module.exports = class VCTimer extends Plugin {
 
       return args;
     }, true);
+
+    PanelSubtext.default.displayName = 'PanelSubtext';
   }
 
   pluginWillUnload () {
