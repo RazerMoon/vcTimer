@@ -1,7 +1,9 @@
 const { Plugin } = require('powercord/entities');
-const { getModule } = require('powercord/webpack');
+const { React, getModule } = require('powercord/webpack');
 const { inject, uninject } = require('powercord/injector');
-const { findInReactTree, findInTree } = require('powercord/util');
+const { findInReactTree } = require('powercord/util');
+
+const Timer = require('./Timer.jsx');
 
 /**
  * Shows how much time has passed since you joined a voice channel.
@@ -11,31 +13,38 @@ const { findInReactTree, findInTree } = require('powercord/util');
  */
 module.exports = class VCTimer extends Plugin {
   startPlugin () {
-    this.patchRTC();
+    this.patchPanel();
   }
 
-  async patchRTC () {
-    const RTC = await getModule((m) => (m.__powercordOriginal_default || m.default)?.displayName === 'RTCConnectionStatus');
+  async patchPanel () {
+    const PanelSubtext = await getModule((m) => (m.__powercordOriginal_default || m.default)?.displayName === 'PanelSubtext');
 
-    // This be brokey
-    inject('vcTimer-RTC-patch', RTC, 'default', (args, res) => {
-      console.dir(args);
-      const resp = (RTC.__powercordOriginal_default || RTC.default).prototype.constructor(args, res);
-      const main = findInReactTree(resp.props, (elm) => elm.props && typeof elm.props.children === 'string');
-      main.props.children = 'bruh';
-      console.dir(resp);
-      RTC.default.prototype.constructor = resp.constructor;
-      // resp.props.children.props.children.props.children.props.children = 'bruh';
-      // resp._reactInternalFiber.child.child.child.sibling.child.child.child.child.child.child.memoizedProps.children = 'bruh';
-      // const msg = findInReactTree(resp._reactInternalFiber, (elm) => elm.memoizedProps && elm.memoizedProps.children === 'Voice Connected');
+    inject('vcTimer-panel-patch', PanelSubtext, 'default', (args) => {
+      const [ { className } ] = args;
 
+      if (!className || !className.includes('channel')) {
+        return args;
+      }
 
-      return resp;
-    }
-    );
+      const hasTimer = findInReactTree(args[0].children, child => child.props && child.props.id === 'timer');
+
+      if (!hasTimer) {
+        const TimerItem = React.createElement(Timer, {
+          id: 'timer'
+        });
+
+        if (!Array.isArray(args[0].children)) {
+          args[0].children = [ args[0].children ];
+        }
+
+        args[0].children.push(TimerItem);
+      }
+
+      return args;
+    }, true);
   }
 
   pluginWillUnload () {
-    uninject('vcTimer-RTC-patch');
+    uninject('vcTimer-panel-patch');
   }
 };
