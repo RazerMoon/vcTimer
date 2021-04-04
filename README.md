@@ -1,5 +1,5 @@
-# Mute New Guild
+# VCTimer
 
-Automatically mutes newly joined guilds.
+Shows how much time has passed since you joined a voice channel.
 
-![1](demo/1.gif)
+![1](demo/1.png)
