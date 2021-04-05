@@ -1,14 +1,25 @@
-const { React } = require('powercord/webpack');
+const { React, FluxDispatcher } = require('powercord/webpack');
 
 module.exports = class Timer extends React.Component {
   constructor (props) {
     super(props);
+    // ? Idk why I can't access 'this' in 'show', thanks god bind exists
+    this.show = this.show.bind(this);
     this.state = {
       seconds: 0
     };
   }
 
+  show (e) {
+    if (e.channelId) {
+      this.setState((state) => (state.seconds = 0));
+    }
+  }
+
   componentDidMount () {
+    // ? Handles channel switches
+    FluxDispatcher.subscribe('VOICE_CHANNEL_SELECT', this.show);
+
     this.interval = setInterval(() => {
       this.setState((state) => (state.seconds += 1));
     }, 1000);
@@ -16,6 +27,7 @@ module.exports = class Timer extends React.Component {
 
   // Usually not needed but interval is being weird here ¯\_(ツ)_/¯
   componentWillUnmount () {
+    FluxDispatcher.unsubscribe('VOICE_CHANNEL_SELECT', this.show);
     clearInterval(this.interval);
   }
 
