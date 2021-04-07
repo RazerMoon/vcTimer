@@ -13,21 +13,20 @@ module.exports = class Timer extends React.Component {
 
   handleChangeChannel (e) {
     if (e.channelId) {
-      this.setState((prev) => ({ ...prev,
-        startTime: Date.now() }));
+      this.setState((prev) => (
+        prev.startTime = Date.now()));
     }
   }
 
   componentDidMount () {
-    this.setState((prev) => ({ ...prev,
-      startTime: Date.now() }));
+    this.setState((prev) => (
+      prev.startTime = Date.now()));
 
     // ? Handles channel switches
     FluxDispatcher.subscribe('VOICE_CHANNEL_SELECT', this.handleChangeChannel);
 
     this.interval = setInterval(() => {
-      this.setState((prev) => ({ ...prev,
-        delta: Date.now() - prev.startTime }));
+      this.setState((prev) => (prev.delta = Math.round((Date.now() - prev.startTime) / 1000) * 1000));
     }, 1000);
   }
 
