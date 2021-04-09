@@ -4,15 +4,15 @@ module.exports = class Timer extends React.Component {
   constructor (props) {
     super(props);
     // ? Idk why I can't access 'this' in 'show', thanks god bind exists
-    this.handleChangeChannel = this.handleChangeChannel.bind(this);
+    this.handleDispatch = this.handleDispatch.bind(this);
     this.state = {
       startTime: 0,
       delta: 0
     };
   }
 
-  handleChangeChannel (e) {
-    if (e.channelId) {
+  handleDispatch (e) {
+    if (e.state && e.state === 'RTC_DISCONNECTED' && !e.hasOwnProperty('streamKey')) {
       this.setState((prev) => (
         prev.startTime = Date.now()));
     }
@@ -23,7 +23,7 @@ module.exports = class Timer extends React.Component {
       prev.startTime = Date.now()));
 
     // ? Handles channel switches
-    FluxDispatcher.subscribe('VOICE_CHANNEL_SELECT', this.handleChangeChannel);
+    FluxDispatcher.subscribe('RTC_CONNECTION_STATE', this.handleDispatch);
 
     this.interval = setInterval(() => {
       this.setState((prev) => (prev.delta = Math.round((Date.now() - prev.startTime) / 1000) * 1000));
@@ -32,7 +32,7 @@ module.exports = class Timer extends React.Component {
 
   // Usually not needed but interval is being weird here ¯\_(ツ)_/¯
   componentWillUnmount () {
-    FluxDispatcher.unsubscribe('VOICE_CHANNEL_SELECT', this.handleChangeChannel);
+    FluxDispatcher.unsubscribe('RTC_CONNECTION_STATE', this.handleDispatch);
     clearInterval(this.interval);
   }
 
