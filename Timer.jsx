@@ -12,21 +12,26 @@ module.exports = class Timer extends React.Component {
   }
 
   handleDispatch (e) {
-    if (e.state && e.state === 'RTC_DISCONNECTED' && !e.hasOwnProperty('streamKey')) {
-      this.setState((prev) => (
-        prev.startTime = Date.now()));
+    if (
+      e.state &&
+      e.state === 'RTC_DISCONNECTED' &&
+      !e.hasOwnProperty('streamKey')
+    ) {
+      this.setState((prev) => (prev.startTime = Date.now()));
     }
   }
 
   componentDidMount () {
-    this.setState((prev) => (
-      prev.startTime = Date.now()));
+    this.setState((prev) => (prev.startTime = Date.now()));
 
     // ? Handles channel switches
     FluxDispatcher.subscribe('RTC_CONNECTION_STATE', this.handleDispatch);
 
     this.interval = setInterval(() => {
-      this.setState((prev) => (prev.delta = Math.round((Date.now() - prev.startTime) / 1000) * 1000));
+      this.setState(
+        (prev) =>
+          (prev.delta = Math.round((Date.now() - prev.startTime) / 1000) * 1000)
+      );
     }, 1000);
   }
 
@@ -38,6 +43,12 @@ module.exports = class Timer extends React.Component {
 
   // https://stackoverflow.com/questions/1322732/convert-seconds-to-hh-mm-ss-with-javascript
   render () {
-    return <p>Time elapsed: {new Date(this.state.delta).toISOString().substr(11, 8)}</p>;
+    return (
+      <>
+        <br />
+        <br />
+        Time elapsed: {new Date(this.state.delta).toISOString().substr(11, 8)}
+      </>
+    );
   }
 };
