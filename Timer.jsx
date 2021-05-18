@@ -46,6 +46,7 @@ module.exports = class Timer extends React.Component {
     return (
       <>
         <br />
+        <br />
         Time elapsed: {new Date(this.state.delta).toISOString().substr(11, 8)}
       </>
     );
